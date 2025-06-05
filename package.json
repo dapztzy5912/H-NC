@@ -1,0 +1,13 @@
+{
+  "name": "instagram-stalker",
+  "version": "1.0.0",
+  "description": "Website stalker Instagram dengan backend Node.js",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.4",
+    "node-fetch": "^3.3.2"
+  }
+}
