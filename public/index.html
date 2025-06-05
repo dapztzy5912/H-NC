@@ -3,97 +3,435 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Instagram Stalker</title>
+  <title>Instagram Profile Viewer</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
     body {
-  font-family: Arial, sans-serif;
-  background: #fafafa;
-  text-align: center;
-  padding: 30px;
-}
-.container {
-  max-width: 500px;
-  margin: auto;
-  background: white;
-  padding: 20px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-}
-input {
-  width: 80%;
-  padding: 10px;
-  margin: 10px 0;
-}
-button {
-  padding: 10px 20px;
-  background: #3897f0;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-.result img {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-top: 20px;
-}
-a {
-  display: inline-block;
-  margin-top: 10px;
-  color: #3897f0;
-  text-decoration: none;
-}
-    </style>
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #833ab4, #fd1d1d, #fcb045);
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 2em;
+      font-weight: 600;
+    }
+    
+    .input-group {
+      position: relative;
+      margin-bottom: 25px;
+    }
+    
+    input {
+      width: 100%;
+      padding: 15px 20px;
+      border: 2px solid #e1e5e9;
+      border-radius: 50px;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s ease;
+      background: #f8f9fa;
+    }
+    
+    input:focus {
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 120px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .loading {
+      display: none;
+      margin: 20px 0;
+    }
+    
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .result {
+      display: none;
+      margin-top: 30px;
+      padding: 30px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      border-radius: 15px;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .profile-pic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 20px;
+      border: 4px solid white;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      display: block;
+    }
+    
+    .profile-name {
+      font-size: 1.5em;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }
+    
+    .profile-username {
+      color: #666;
+      font-size: 1.1em;
+      margin-bottom: 20px;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin: 20px 0;
+    }
+    
+    .stat-item {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-number {
+      font-size: 1.2em;
+      font-weight: 700;
+      color: #667eea;
+    }
+    
+    .stat-label {
+      font-size: 0.9em;
+      color: #666;
+      margin-top: 5px;
+    }
+    
+    .bio {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 20px 0;
+      text-align: left;
+      line-height: 1.5;
+      color: #333;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .profile-link {
+      display: inline-block;
+      background: linear-gradient(135deg, #833ab4, #fd1d1d);
+      color: white;
+      padding: 12px 30px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 600;
+      margin-top: 20px;
+      transition: all 0.3s ease;
+    }
+    
+    .profile-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(131, 58, 180, 0.3);
+    }
+    
+    .badge {
+      display: inline-block;
+      background: #28a745;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      margin-left: 8px;
+    }
+    
+    .private-badge {
+      background: #dc3545;
+    }
+    
+    .error {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 20px 0;
+      border: 1px solid #f5c6cb;
+    }
+    
+    @media (max-width: 480px) {
+      .container {
+        padding: 30px 20px;
+        margin: 10px;
+      }
+      
+      .stats {
+        grid-template-columns: 1fr;
+      }
+      
+      h1 {
+        font-size: 1.5em;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h1>Instagram Stalker</h1>
-    <input type="text" id="username" placeholder="Masukkan username Instagram" />
-    <button onclick="stalk()">Stalk</button>
+    <h1>📸 Instagram Profile Viewer</h1>
     
-    <div id="result" class="result" style="display: none;">
-      <img id="profilePic" alt="Foto Profil" />
-      <h2 id="name"></h2>
-      <p><strong>Username:</strong> <span id="usernameDisplay"></span></p>
-      <p><strong>Followers:</strong> <span id="followers"></span></p>
-      <p><strong>Following:</strong> <span id="following"></span></p>
-      <p><strong>Bio:</strong> <span id="bio"></span></p>
-      <p><strong>Post:</strong> <span id="post"></span></p>
-      <a id="profileLink" href="#" target="_blank">Lihat Profil</a>
+    <div class="input-group">
+      <input 
+        type="text" 
+        id="username" 
+        placeholder="Masukkan username Instagram (tanpa @)" 
+        maxlength="30"
+        autocomplete="off"
+      />
+    </div>
+    
+    <button class="btn" onclick="searchProfile()" id="searchBtn">
+      🔍 Cari Profil
+    </button>
+    
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Mencari profil...</p>
+    </div>
+    
+    <div id="error" class="error" style="display: none;"></div>
+    
+    <div id="result" class="result">
+      <img id="profilePic" class="profile-pic" alt="Foto Profil" />
+      <div class="profile-name" id="name"></div>
+      <div class="profile-username" id="usernameDisplay"></div>
+      
+      <div class="stats">
+        <div class="stat-item">
+          <div class="stat-number" id="post">0</div>
+          <div class="stat-label">Posts</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="followers">0</div>
+          <div class="stat-label">Followers</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="following">0</div>
+          <div class="stat-label">Following</div>
+        </div>
+      </div>
+      
+      <div class="bio" id="bioContainer" style="display: none;">
+        <strong>Bio:</strong><br>
+        <span id="bio"></span>
+      </div>
+      
+      <a id="profileLink" class="profile-link" href="#" target="_blank">
+        📱 Lihat di Instagram
+      </a>
     </div>
   </div>
 
   <script>
-    async function stalk() {
-  const username = document.getElementById('username').value;
-  if (!username) return alert("Masukkan username terlebih dahulu!");
-
-  try {
-    const response = await fetch(`/api/stalk?username=${username}`);
-    const data = await response.json();
-
-    if (data.status !== true) {
-      alert("Username tidak ditemukan atau terjadi kesalahan.");
-      return;
+    let isSearching = false;
+    
+    function formatNumber(num) {
+      if (num >= 1000000) {
+        return (num / 1000000).toFixed(1) + 'M';
+      } else if (num >= 1000) {
+        return (num / 1000).toFixed(1) + 'K';
+      }
+      return num.toString();
     }
-
-    const hasil = data.result;
-    document.getElementById('profilePic').src = hasil.profile_pic_url;
-    document.getElementById('name').innerText = hasil.fullname;
-    document.getElementById('usernameDisplay').innerText = hasil.username;
-    document.getElementById('followers').innerText = hasil.followers;
-    document.getElementById('following').innerText = hasil.following;
-    document.getElementById('bio').innerText = hasil.bio || "-";
-    document.getElementById('post').innerText = hasil.post;
-    document.getElementById('profileLink').href = `https://instagram.com/${hasil.username}`;
-
-    document.getElementById('result').style.display = 'block';
-  } catch (err) {
-    alert("Gagal mengambil data.");
-    console.error(err);
-  }
-}
+    
+    function showError(message) {
+      const errorDiv = document.getElementById('error');
+      errorDiv.textContent = message;
+      errorDiv.style.display = 'block';
+      setTimeout(() => {
+        errorDiv.style.display = 'none';
+      }, 5000);
+    }
+    
+    function validateUsername(username) {
+      const regex = /^[a-zA-Z0-9._]{1,30}$/;
+      return regex.test(username);
+    }
+    
+    async function searchProfile() {
+      if (isSearching) return;
+      
+      const username = document.getElementById('username').value.trim();
+      const searchBtn = document.getElementById('searchBtn');
+      const loading = document.getElementById('loading');
+      const result = document.getElementById('result');
+      
+      // Reset previous results
+      result.style.display = 'none';
+      document.getElementById('error').style.display = 'none';
+      
+      // Validation
+      if (!username) {
+        showError('Masukkan username terlebih dahulu!');
+        return;
+      }
+      
+      if (!validateUsername(username)) {
+        showError('Username tidak valid! Gunakan 1-30 karakter (huruf, angka, titik, underscore)');
+        return;
+      }
+      
+      // Start loading
+      isSearching = true;
+      searchBtn.disabled = true;
+      searchBtn.textContent = 'Mencari...';
+      loading.style.display = 'block';
+      
+      try {
+        const response = await fetch(`/api/stalk?username=${encodeURIComponent(username)}`);
+        const data = await response.json();
+        
+        if (data.status !== true) {
+          throw new Error(data.error || 'Username tidak ditemukan atau terjadi kesalahan.');
+        }
+        
+        const profile = data.result;
+        
+        // Update profile information
+        document.getElementById('profilePic').src = profile.profile_pic_url || '/placeholder-avatar.png';
+        document.getElementById('profilePic').onerror = function() {
+          this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iNjAiIGN5PSI2MCIgcj0iNjAiIGZpbGw9IiNmMGYwZjAiLz48cGF0aCBkPSJNNjAgMzBjLTE2LjU2OSAwLTMwIDEzLjQzMS0zMCAzMHMxMy40MzEgMzAgMzAgMzAgMzAtMTMuNDMxIDMwLTMwUzc2LjU2OSAzMCA2MCAzMHptMCA1NGMtMTMuMjU1IDAtMjQtMTAuNzQ1LTI0LTI0czEwLjc0NS0yNCAyNC0yNCAyNCAxMC43NDUgMjQgMjRTNzMuMjU1IDg0IDYwIDg0eiIgZmlsbD0iI2NjYyIvPjwvc3ZnPg==';
+        };
+        
+        // Profile name with verification badge
+        let nameHtml = profile.fullname || profile.username;
+        if (profile.is_verified) {
+          nameHtml += '<span class="badge">✓ Verified</span>';
+        }
+        if (profile.is_private) {
+          nameHtml += '<span class="badge private-badge">🔒 Private</span>';
+        }
+        document.getElementById('name').innerHTML = nameHtml;
+        
+        document.getElementById('usernameDisplay').textContent = '@' + profile.username;
+        document.getElementById('post').textContent = formatNumber(profile.post);
+        document.getElementById('followers').textContent = formatNumber(profile.followers);
+        document.getElementById('following').textContent = formatNumber(profile.following);
+        
+        // Bio
+        const bioContainer = document.getElementById('bioContainer');
+        const bioText = document.getElementById('bio');
+        if (profile.bio && profile.bio.trim()) {
+          bioText.textContent = profile.bio;
+          bioContainer.style.display = 'block';
+        } else {
+          bioContainer.style.display = 'none';
+        }
+        
+        document.getElementById('profileLink').href = `https://instagram.com/${profile.username}`;
+        
+        // Show result
+        result.style.display = 'block';
+        
+      } catch (err) {
+        console.error('Search error:', err);
+        showError(err.message || 'Gagal mencari profil. Silakan coba lagi.');
+      } finally {
+        // Reset loading state
+        isSearching = false;
+        searchBtn.disabled = false;
+        searchBtn.textContent = '🔍 Cari Profil';
+        loading.style.display = 'none';
+      }
+    }
+    
+    // Enter key support
+    document.getElementById('username').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        searchProfile();
+      }
+    });
+    
+    // Auto-clear username field when typing
+    document.getElementById('username').addEventListener('input', function(e) {
+      // Remove @ symbol if user types it
+      if (e.target.value.startsWith('@')) {
+        e.target.value = e.target.value.substring(1);
+      }
+    });
   </script>
 </body>
 </html>
