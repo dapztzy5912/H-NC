@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Instagram Stalker</title>
+  <style>
+    body {
+  font-family: Arial, sans-serif;
+  background: #fafafa;
+  text-align: center;
+  padding: 30px;
+}
+.container {
+  max-width: 500px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+input {
+  width: 80%;
+  padding: 10px;
+  margin: 10px 0;
+}
+button {
+  padding: 10px 20px;
+  background: #3897f0;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+.result img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-top: 20px;
+}
+a {
+  display: inline-block;
+  margin-top: 10px;
+  color: #3897f0;
+  text-decoration: none;
+}
+    </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Instagram Stalker</h1>
+    <input type="text" id="username" placeholder="Masukkan username Instagram" />
+    <button onclick="stalk()">Stalk</button>
+    
+    <div id="result" class="result" style="display: none;">
+      <img id="profilePic" alt="Foto Profil" />
+      <h2 id="name"></h2>
+      <p><strong>Username:</strong> <span id="usernameDisplay"></span></p>
+      <p><strong>Followers:</strong> <span id="followers"></span></p>
+      <p><strong>Following:</strong> <span id="following"></span></p>
+      <p><strong>Bio:</strong> <span id="bio"></span></p>
+      <p><strong>Post:</strong> <span id="post"></span></p>
+      <a id="profileLink" href="#" target="_blank">Lihat Profil</a>
+    </div>
+  </div>
+
+  <script>
+    async function stalk() {
+  const username = document.getElementById('username').value;
+  if (!username) return alert("Masukkan username terlebih dahulu!");
+
+  try {
+    const response = await fetch(`/api/stalk?username=${username}`);
+    const data = await response.json();
+
+    if (data.status !== true) {
+      alert("Username tidak ditemukan atau terjadi kesalahan.");
+      return;
+    }
+
+    const hasil = data.result;
+    document.getElementById('profilePic').src = hasil.profile_pic_url;
+    document.getElementById('name').innerText = hasil.fullname;
+    document.getElementById('usernameDisplay').innerText = hasil.username;
+    document.getElementById('followers').innerText = hasil.followers;
+    document.getElementById('following').innerText = hasil.following;
+    document.getElementById('bio').innerText = hasil.bio || "-";
+    document.getElementById('post').innerText = hasil.post;
+    document.getElementById('profileLink').href = `https://instagram.com/${hasil.username}`;
+
+    document.getElementById('result').style.display = 'block';
+  } catch (err) {
+    alert("Gagal mengambil data.");
+    console.error(err);
+  }
+}
+  </script>
+</body>
+</html>
